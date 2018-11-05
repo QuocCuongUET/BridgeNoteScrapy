@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, Date, Numeric, TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import create_engine
+from scrapy.utils.project import get_project_settings
 
 
 DeclarativeBase = declarative_base()
@@ -8,12 +9,11 @@ DeclarativeBase = declarative_base()
 
 # Opening connect to database bridgenotedb
 def db_connect():
-	DB_ENGINE = 'mysql+pymysql://root:123456@172.16.0.11/bridgenotedb'
 
-	return create_engine(DB_ENGINE, echo=True)
+	return create_engine(get_project_settings().get("CONNECTION_STRING"), echo=True)
 
 # Create table for database
-def create_jobs_table(engine):
+def create_table(engine):
 
 	DeclarativeBase.metadata.create_all(engine)
 

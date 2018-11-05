@@ -14,6 +14,15 @@ BOT_NAME = 'BridgeNoteScrapy'
 SPIDER_MODULES = ['BridgeNoteScrapy.spiders']
 NEWSPIDER_MODULE = 'BridgeNoteScrapy.spiders'
 
+CONNECTION_STRING = "{drivername}://{user}:{passwd}@{host}:{port}/{db_name}?charset=utf8".format(
+    drivername="mysql+pymysql",
+    user="root",
+    passwd="123456",
+    host="172.16.0.11",
+    port="3306",
+    db_name="bridgenotedb",
+)
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'BridgeNoteScrapy (+http://www.yourdomain.com)'
@@ -64,9 +73,10 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'BridgeNoteScrapy.pipelines.BridgenotescrapyPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'BridgeNoteScrapy.pipelines.BridgenotescrapyPipeline': 300,
+   'BridgeNoteScrapy.pipelines.WriteToMySqlDBPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
