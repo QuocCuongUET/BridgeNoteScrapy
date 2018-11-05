@@ -1,6 +1,8 @@
 import scrapy
 import csv
 from datetime import datetime, timedelta
+from BridgeNoteScrapy.items import BridgenotescrapyItem
+from BridgeNoteScrapy.currency_id import detectCurrencyId
 
 class KemenkeuSpider(scrapy.Spider):
     name = "kemenkeu"
@@ -10,6 +12,7 @@ class KemenkeuSpider(scrapy.Spider):
     STR_DATE_FORMAT = "%Y%m%d"
     ID_DATE_FORMAT = "%m/%d/%Y"
     URL_INDO = "http://www.fiskal.kemenkeu.go.id/dw-kurs-db.asp"
+    BASED_CURRENCY_ID_IND = 3
 
     def start_requests(self):
         return [scrapy.FormRequest( self.URL_INDO,
@@ -21,10 +24,11 @@ class KemenkeuSpider(scrapy.Spider):
 
         data_trs = table.css('tr')
         for tr in data_trs:
-            td = tr.css('td::text');
+            td = tr.css('td::text')
 
-            data = [td[0].extract(), td[1].extract(), td[2].extract(), td[3].extract()]
-            yield self.writeCSV(data)
+            item = self.createItem(td)
+
+            yield item
 
         if( self.inTimeToSearch(self.start_time, self.end_time) ):
             self.start_time = self.inCreaseTimeByOneDay(self.start_time)
@@ -57,3 +61,37 @@ class KemenkeuSpider(scrapy.Spider):
         next_time = next_time + timedelta(days=1)
 
         return next_time.strftime(self.STR_DATE_FORMAT)
+
+    def createItem(self, data):
+
+        transfer_currency_id   = self.dectectCurrency(data[1].extract())
+        rate_currency_transfer = self.formatRateCurrency(data[2].extract())
+
+        item = BridgenotescrapyItem()
+
+        item['transfer_date'] = self.start_time
+
+        item['based_currency_id'] = self.BASED_CURRENCY_ID_IND
+
+        item['transfer_currency_id'] = detectCurrencyId(transfer_currency_id)
+
+        item['rate_currency_transfer'] = rate_currency_transfer
+
+        item['rate_tax_currency_transfer'] = 0
+
+        item['update_user_id'] = 0
+
+        item['created_at'] = datetime.now()
+
+        return item
+
+    def dectectCurrency(self, str):
+
+        # Because format str is 'somthing word (USD)'
+        return str[-5:][1:4] # HardCode
+
+    def formatRateCurrency(self, str):
+
+        # Format string is same 932,485,392.983
+        rate_currency_transfer = str.replace(',', '')
+        return round(float(rate_currency_transfer), 6)
