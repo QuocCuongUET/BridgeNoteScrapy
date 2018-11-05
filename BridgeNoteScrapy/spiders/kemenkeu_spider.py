@@ -1,7 +1,7 @@
 import scrapy
 import csv
 from datetime import datetime, timedelta
-from BridgeNoteScrapy.items import BridgenotescrapyItem
+from BridgeNoteScrapy.items import ForeignCurrencyRatesItem
 from BridgeNoteScrapy.currency_id import detectCurrencyId
 
 class KemenkeuSpider(scrapy.Spider):
@@ -33,7 +33,7 @@ class KemenkeuSpider(scrapy.Spider):
         if( self.inTimeToSearch(self.start_time, self.end_time) ):
             self.start_time = self.inCreaseTimeByOneDay(self.start_time)
             formdata = self.formDataDate(self.start_time)
-            yield scrapy.FormRequest("http://www.fiskal.kemenkeu.go.id/dw-kurs-db.asp",
+            yield scrapy.FormRequest(self.URL_INDO,
                                    formdata=formdata,
                                    callback=self.parse)
 
@@ -67,7 +67,7 @@ class KemenkeuSpider(scrapy.Spider):
         transfer_currency_id   = self.dectectCurrency(data[1].extract())
         rate_currency_transfer = self.formatRateCurrency(data[2].extract())
 
-        item = BridgenotescrapyItem()
+        item = ForeignCurrencyRatesItem()
 
         item['transfer_date'] = self.start_time
 

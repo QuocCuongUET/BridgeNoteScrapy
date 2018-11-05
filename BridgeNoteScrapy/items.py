@@ -8,7 +8,7 @@
 import scrapy
 
 
-class BridgenotescrapyItem(scrapy.Item):
+class ForeignCurrencyRatesItem(scrapy.Item):
 
 	transfer_date              = scrapy.Field()
 	based_currency_id          = scrapy.Field()
