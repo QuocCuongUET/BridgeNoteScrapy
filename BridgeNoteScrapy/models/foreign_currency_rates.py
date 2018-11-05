@@ -1,6 +1,23 @@
-from sqlalchemy import create_engine, Column, Integer, Date, Numeric, TIMESTAMP
+from sqlalchemy import Column, Integer, Date, Numeric, TIMESTAMP
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine import create_engine
 
-class ForeignCurrencyRates(Base):
+
+DeclarativeBase = declarative_base()
+
+
+# Opening connect to database bridgenotedb
+def db_connect():
+	DB_ENGINE = 'mysql+pymysql://root:123456@172.16.0.11/bridgenotedb'
+
+	return create_engine(DB_ENGINE, echo=True)
+
+# Create table for database
+def create_jobs_table(engine):
+
+	DeclarativeBase.metadata.create_all(engine)
+
+class ForeignCurrencyRates(DeclarativeBase):
 
 	__tablename__ = "foreign_currency_rates"
 
