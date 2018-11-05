@@ -1,4 +1,5 @@
 import scrapy
+import csv
 from datetime import datetime, timedelta
 
 class KemenkeuSpider(scrapy.Spider):
@@ -15,10 +16,18 @@ class KemenkeuSpider(scrapy.Spider):
         data_trs = table.css('tr')
         for tr in data_trs:
             td = tr.css('td::text');
-            data = {
-                'No':        td[0].extract(),
-                'Mata Uang': td[1].extract(),
-                'Nilai':     td[2].extract(),
-                'Perubahan': td[3].extract(),
-            }
-            yield data
+            # data = {
+            #     'No':        td[0].extract(),
+            #     'Mata Uang': td[1].extract(),
+            #     'Nilai':     td[2].extract(),
+            #     'Perubahan': td[3].extract(),
+            # }
+            # yield data
+
+            data = [td[0].extract(), td[1].extract(), td[2].extract(), td[3].extract()]
+            yield self.writeCSV(data)
+
+    def writeCSV(self, data):
+        with open('kemenkeu.csv', 'a') as csvfile:
+            spamwriter = csv.writer(csvfile, delimiter=',')
+            spamwriter.writerow(data)
