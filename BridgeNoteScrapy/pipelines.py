@@ -8,21 +8,20 @@ class BridgenotescrapyPipeline(object):
 class WriteToMySqlDBPipeline(object):
 
     def __init__(self):
+        self.listForeignCurrencyRates = list()
+
+    def open_spider(self, spider):
         engine = db_connect()
 
         create_table(engine)
 
         self.Session = sessionmaker(bind=engine)
 
-
-    def process_item(self, item, spider):
-
+    def close_spider(self, spider):
         session = self.Session()
 
-        obj = self.createForeignCurrencyRates(item)
-
         try:
-            session.add(obj)
+            session.bulk_save_objects(self.listForeignCurrencyRates)
 
             session.commit()
         except:
@@ -31,6 +30,12 @@ class WriteToMySqlDBPipeline(object):
             raise
         finally:
             session.close()
+
+    def process_item(self, item, spider):
+
+        obj = self.createForeignCurrencyRates(item)
+
+        self.listForeignCurrencyRates.append(obj)
 
         return item
 
