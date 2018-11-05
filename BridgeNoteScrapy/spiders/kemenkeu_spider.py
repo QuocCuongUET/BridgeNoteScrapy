@@ -5,9 +5,14 @@ from datetime import datetime, timedelta
 class KemenkeuSpider(scrapy.Spider):
     name = "kemenkeu"
 
+    start_time = '20180927'
+    STR_DATE_FORMAT = "%Y%m%d"
+    ID_DATE_FORMAT = "%m/%d/%Y"
+    URL_INDO = "http://www.fiskal.kemenkeu.go.id/dw-kurs-db.asp"
+
     def start_requests(self):
-        return [scrapy.FormRequest( 'http://www.fiskal.kemenkeu.go.id/dw-kurs-db.asp',
-                                    formdata = {'strDate': '20181029', 'id': '10/29/2018'},
+        return [scrapy.FormRequest( self.URL_INDO,
+                                    formdata = self.formDataDate(self.start_time),
                                     callback = self.parse)]
 
     def parse(self, response):
@@ -24,3 +29,11 @@ class KemenkeuSpider(scrapy.Spider):
         with open('kemenkeu.csv', 'a') as csvfile:
             spamwriter = csv.writer(csvfile, delimiter=',')
             spamwriter.writerow(data)
+
+    def formDataDate(self, time):
+        str_time = datetime.strptime(time, self.STR_DATE_FORMAT)
+
+        return {
+            "strDate" : datetime.strftime(str_time, self.STR_DATE_FORMAT),
+            "id"      : datetime.strftime(str_time, self.ID_DATE_FORMAT)
+        }
