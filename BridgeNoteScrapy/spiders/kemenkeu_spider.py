@@ -16,13 +16,6 @@ class KemenkeuSpider(scrapy.Spider):
         data_trs = table.css('tr')
         for tr in data_trs:
             td = tr.css('td::text');
-            # data = {
-            #     'No':        td[0].extract(),
-            #     'Mata Uang': td[1].extract(),
-            #     'Nilai':     td[2].extract(),
-            #     'Perubahan': td[3].extract(),
-            # }
-            # yield data
 
             data = [td[0].extract(), td[1].extract(), td[2].extract(), td[3].extract()]
             yield self.writeCSV(data)
